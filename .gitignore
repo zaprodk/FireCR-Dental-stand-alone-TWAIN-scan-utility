@@ -1,1 +1,5 @@
 dist/settings.txt
+/build
+FireCR_Capture_V5.spec
+dist/FireCR_Capture_V5.exe
+settings.txt

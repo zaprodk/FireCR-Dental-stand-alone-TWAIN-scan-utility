@@ -1,44 +1,59 @@
-# FireCR 16-bit Radiography & Inspection
+# FireCR 16-bit Radiography & Electronics Inspection (V5.0)
 
-A lightweight, high-dynamic-range acquisition and analysis desktop application tailored for **FireCR Dental** computed radiography (CR) scanners. Designed primarily for non-destructive testing (NDT), electronics inspection, reverse engineering, and radiography analysis using reusable photostimulable phosphor (PSP) imaging plates.
+A standalone, high-dynamic-range acquisition and analysis desktop application tailored for **FireCR Dental** computed radiography (CR) scanners. Engineered specifically for non-destructive testing (NDT), electronics failure analysis, silicon die inspection, PCB reverse engineering, and radiographic measurement.
 
-![FireCR Capture Interface](screenshot.png)
+![FireCR Inspection Interface](screenshot.png)
 
 ---
 
 ## Overview
 
-Most legacy and clinical software packages bundled with dental computed radiography hardware constrain image data to 8-bit displays, lock scans into closed medical databases, or apply proprietary tone curves. 
+Clinical dental packages bundled with computed radiography hardware often lock scans into closed patient databases, truncate data to 8-bit displays, and apply unalterable medical tone curves. 
 
-This application connects directly to the 32-bit TWAIN data source (`FireCRDentTwain32.ds`), pulls uncompressed **16-bit linear raw sensor data** directly from memory buffers, and provides real-time image processing, pseudo-coloring, adaptive local contrast enhancement, and calibrated metric measurement tools.
+This utility connects directly to the 32-bit TWAIN driver (`FireCRDentTwain32.ds`) to extract **true, uncompressed 16-bit linear sensor data** straight from memory buffers. Version 5.0 introduces comprehensive radiographic digital signal processing—including true Window Width/Leveling with live on-canvas mouse drag, real-time log-scaled histogram feedback, latitude dynamic range compression, dual-axis edge enhancement, and calibrated metric calipers.
+
+---
+
+## What's New in V5.0
+
+* **Radiographic Windowing (WW / WL):** Calibrated 16-bit Window Center (Level) and Window Width controls replace generic photo sliders, matching medical/NDT standards.
+* **Interactive On-Image Mouse Dragging:** Drag anywhere on the canvas with the **Middle Mouse Button** (or **Ctrl + Left Click**) to adjust windowing in real time:
+  * **Vertical Drag:** Shifts Window Center (Level / tissue density penetration).
+  * **Horizontal Drag:** Expands or narrows Window Width (contrast steepness).
+* **Live 16-bit Log Intensity Histogram:** Real-time detector histogram overlay showing active display window boundaries and center lines directly over the sensor's dynamic distribution.
+* **Latitude Reduction (Dynamic Range Compression):** Spatial unsharp low-frequency compression that suppresses extreme density gradients (such as ground planes and lead frames) so fine $25\ \mu\text{m}$ bonding wires and dense metal components remain visible simultaneously.
+* **Dual-Axis Edge Filtering:** Independent control over **Edge Gain** (0–10) and **Edge Frequency / Scale** (1–5) to selectively target microscopic wire bonds without blowing out macroscopic package contours into halos.
+* **Edge-Preserving Noise Reduction:** Fast bilateral filtering to smooth high-frequency phosphor plate grain and PMT shot noise while keeping edge transitions razor-sharp.
+* **One-Click Inspection Presets:** Instant configuration profiles for common electronics inspection workflows (*Linear Raw*, *Wire Bond & Die*, *Solder & Voids*, *BGA Structural*).
+* **Python 3.13 Win32 Modal Protection:** Hardened against message-pump GIL re-entrancy crashes during scanner modal loops.
+* **Responsive Compact Layout:** Re-engineered sidebar with auto-sizing geometry and auto-hiding scrollbars that fits 1080p displays natively.
 
 ---
 
 ## Key Features
 
-* **True 16-bit Ingestion:** Extracts uncompressed 16-bit grayscale bitmaps from native TWAIN DIB memory structures, preserving the full dynamic range of the scanner's photomultiplier tube (PMT).
-* **Pseudo-Color False-Color Palettes:** Real-time OpenCV color mapping to highlight subtle density variations across silicon dies, bond wires, PCB traces, and solder joints:
+* **True 16-bit Acquisition:** Direct parsing of native TWAIN DIB memory structures to preserve the full dynamic range of the scanner's photomultiplier tube (PMT).
+* **Calibrated Digital Caliper:** On-the-fly component dimensioning, trace clearance, and pitch measurements in millimeters (**mm**), thousandths of an inch (**mil**), and raw **pixels**.
+* **Pseudo-Color False-Color Palettes:** Real-time color mapping to highlight density changes:
+  * *Monochrome (Raw Grayscale)*
   * *X-Ray Teardown (Jet)*
   * *Turbo (Perceptually Uniform)*
   * *Inferno (Thermal Density)*
   * *Ocean (Clinical Blue)*
   * *Hot (Black to Red/Yellow)*
-  * *Monochrome (Raw Grayscale)*
-* **CLAHE (Contrast-Limited Adaptive Histogram Equalization):** Localized histogram equalization to expose low-contrast trace routing and internal wire bonds obscured by dense metal shields or ground planes.
-* **Non-Destructive Adjustments:** Real-time 65,536-level lookup table (LUT) processing for window leveling (brightness), contrast scaling, gamma curves, edge sharpening (unsharp mask), and density inversion.
-* **Calibrated Digital Caliper:** Measure physical component dimensions, trace pitches, and clearances directly in millimeters, mils (thousandths of an inch), or raw pixels based on configurable scanner pixel pitch (e.g., 35 µm).
-* **Hardware-Accelerated Viewport:** Fast fractional and integer zoom (up to 15×), mouse-centered zooming, panning, and native 1:1 pixel inspection.
-* **Archival Export:** Save processed views as PNG or full 16-bit high-dynamic-range TIFF files named with ISO 8601 chronological timestamps (`Scan_YYYYMMDD_HHMMSS.tif`).
+* **CLAHE (Local Adaptive Equalization):** Localized histogram equalization to pull hidden routing out of dark shadows.
+* **Hardware-Accelerated Viewport:** Fast fractional zoom (up to 15×), pan, 90° array rotation, and 1:1 native sensor pixel inspection.
+* **Archival Export:** Exports full dynamic range 16-bit TIFF files (`DDMMYY-HHMMSS.tiff`) with current windowing calculations preserved, or 8-bit PNG snapshots.
 
 ---
 
 ## System Requirements & Architecture
 
-Because computed radiography drivers for the FireCR series (and most legacy dental hardware) are compiled strictly as **32-bit (x86) binaries**, this software **must run under a 32-bit Python environment**. A 64-bit Python runtime cannot bind to 32-bit TWAIN Data Source Managers (`twain_32.dll`).
+Because the FireCR driver architecture and TWAIN Data Source (`FireCRDentTwain32.ds` / `CRSwing.dll`) are compiled strictly as **32-bit (x86) binaries**, this software **must run under a 32-bit Python environment**. A 64-bit Python runtime cannot bind to 32-bit TWAIN managers (`twain_32.dll`).
 
-* **Operating System:** Windows 10 / 11 (64-bit host OS is supported, running 32-bit Python).
-* **Hardware:** 3DISC / Digiray / Quantor FireCR Dental reader.
-* **Drivers:** FireCR Dental TWAIN Driver installed (`C:\Windows\twain_32\FireCRDental\FireCRDentTwain32.ds`).
+* **Operating System:** Windows 10 / 11 (64-bit OS fully supported via 32-bit Python runtime).
+* **Hardware:** 3DISC / Digiray / Quantor FireCR Dental scanner.
+* **Driver:** FireCR Dental TWAIN Driver installed (`C:\Windows\twain_32\FireCRDental\FireCRDentTwain32.ds`).
 * **Python Runtime:** Python 3.10 – 3.13 **(32-bit / x86 version)**.
 
 ---
@@ -46,9 +61,9 @@ Because computed radiography drivers for the FireCR series (and most legacy dent
 ## Installation
 
 ### 1. Install 32-bit Python
-Download and install the **Windows installer (32-bit)** from [python.org](https://www.python.org/downloads/windows/). Ensure you check **"Add python.exe to PATH"** during setup.
+Download the **Windows installer (32-bit)** from [python.org](https://www.python.org/downloads/windows/). Ensure **"Add python.exe to PATH"** is checked during setup.
 
-Verify that your 32-bit interpreter is accessible:
+Verify your 32-bit interpreter:
 ```cmd
 py -3-32 --version
 ```
@@ -60,87 +75,47 @@ cd firecr-radiography
 ```
 
 ### 3. Install Dependencies
-Install the required packages in your 32-bit Python environment:
-```cmd
-py -3-32 -m pip install -r requirements.txt
-```
-
-If installing manually:
 ```cmd
 py -3-32 -m pip install numpy opencv-python pillow pytwain
 ```
 
 ---
 
-## Usage
-
-Launch the application:
-```cmd
-py -3-32 firecr_capture.py
-```
-
-### Workflow
-
-1. **Acquire:** Click **Acquire from FireCR** on the top toolbar. The native modal scanner interface will appear.
-2. **Scan:** Insert your photostimulable phosphor plate (Size 0, 1, 2, 3, or 4c) into the scanner feeder slot.
-3. **Inspect:** Once the scan finishes, the 16-bit image transfers directly into the canvas.
-4. **Enhance:**
-   * Toggle **CLAHE** to pull traces and bond wires out of dark shadow regions.
-   * Switch the **Pseudo-Color Palette** to *X-Ray Teardown (Jet)* or *Turbo* to visualize density gradations.
-   * Fine-tune **Brightness**, **Contrast**, and **Gamma**.
-5. **Measure:**
-   * Toggle the **Caliper Tool** on the toolbar (or right-click and drag on the image).
-   * Enter the exact optical scanner pixel pitch (default is `35.0` µm for high-resolution dental CR plates).
-   * Readouts display distance in **mm**, **mil**, and **px**.
-6. **Save:** Click **Save Image...** to export a 16-bit `.tif` or `.png`. Use **Open Folder** to view recent scans in Windows Explorer.
-
----
-
-## Configuration (`settings.txt`)
-
-User preferences (color palettes, slider positions, pixel pitch, and last used directories) persist automatically across sessions in a JSON-formatted `settings.txt` created in the application root directory:
-
-```json
-{
-    "twain_source": "FireCR Dental",
-    "palette": "X-Ray Teardown (Jet)",
-    "brightness": 0.0,
-    "contrast": 1.2,
-    "gamma": 1.1,
-    "sharpness": 1.0,
-    "clahe_enabled": true,
-    "clahe_clip": 2.0,
-    "invert": true,
-    "pixel_pitch_um": 35.0,
-    "last_saved_dir": "C:\\Scans"
-}
-```
-
-Click **Save Settings as Default** in the control panel to lock in your preferred initial calibration and display values.
-
----
-
-## Viewport Controls
+## Viewport & Mouse Controls
 
 | Input | Action |
 | :--- | :--- |
-| **Left Click + Drag** | Pan image across canvas (when Caliper is off) |
-| **Mouse Wheel** | Zoom in / Zoom out centered on cursor |
-| **Right Click + Drag** | Draw quick caliper measurement line |
-| **Fit View Button** | Scale image to fit viewport |
-| **1:1 Native Pixels Button** | View full unscaled sensor resolution |
-| **Rotate 90° Button** | Rotate sensor array 90 degrees clockwise |
+| **Middle-Click + Drag** | **Interactive Window/Level:** Vertical = Center, Horizontal = Width |
+| **Ctrl + Left-Click + Drag** | **Interactive Window/Level** (Alternative for laptops/touchpads) |
+| **Left-Click + Drag** | Pan image across canvas (when Caliper is off) |
+| **Mouse Wheel** | Zoom in / Zoom out centered on mouse cursor |
+| **Right-Click + Drag** | Quick Caliper Measurement |
+| **Fit View** | Auto-scale image to current viewport |
+| **1:1 Native Pixels** | 100% unscaled detector resolution |
+| **Rotate 90°** | Rotate detector array 90° clockwise |
 
 ---
 
-## Technical Notes
+## Inspection Presets
 
-* **Direct BMP Memory Parsing:** Rather than relying on standard GDI/Pillow decoders that truncate 16-bit grayscale bitmaps to 8 bits, the program unpacks the raw TWAIN DIB memory buffer using custom 16-bit row stride alignment:
+| Preset | Target Application | Signal Processing Chain |
+| :--- | :--- | :--- |
+| **Linear (Raw)** | Flat sensor data inspection | Unprocessed full-scale linear window, monochrome palette. |
+| **Wire Bond & Die** | Micro-bonding wires, silicon dies | Mid-low window level, high-frequency edge boost (Scale 1), bilateral denoising, CLAHE. |
+| **Solder & Voids** | BGA balls, solder bridging, voids | Higher window level, medium edge scale, *Jet* pseudo-color colormap. |
+| **BGA Structural** | Large package frames, ground planes | Heavy Latitude Reduction (Level 8) to suppress ground plane blowout, Macro edge enhancement. |
+
+---
+
+## Technical Specifications
+
+* **Row Stride Unpacking:** Bypasses GDI 8-bit truncation using direct 32-bit aligned 16-bit row-stride memory reading:
   $$\text{Row Stride} = \left\lfloor \frac{\text{Width} \times 2 + 3}{4} \right\rfloor \times 4$$
-* **Percentile Dynamic Range Normalization:** Images are auto-leveled based on the 0.1th and 99.9th percentiles of raw intensity, avoiding saturation from single dead/hot detector pixels.
+* **Percentile Auto-Ranging:** Computes 0.1% and 99.9% intensity percentiles upon capture to eliminate dead/hot detector pixel bias when setting initial Window Center/Width.
+* **Persistent Settings:** Slider positions, custom pixel pitches, palettes, and directory paths automatically save to `settings.txt`.
 
 ---
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for details.

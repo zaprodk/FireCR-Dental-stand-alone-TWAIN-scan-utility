@@ -1,4 +1,5 @@
 {
+    "twain_source": "FireCR Dental",
     "palette": "X-Ray Teardown (Jet)",
     "brightness": 0.0,
     "contrast": 1.2,
